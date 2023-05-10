@@ -3,9 +3,14 @@ module audio-convert
 go 1.20
 
 require (
-	github.com/3d0c/gmf v0.0.0-20220906170454-be727bc5b56c // indirect
-	github.com/aws/aws-sdk-go v1.38.20 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/u2takey/ffmpeg-go v0.4.1 // indirect
-	github.com/u2takey/go-utils v0.3.1 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
+	github.com/meryemchafry/go-cpulimit v0.0.0-20211126083921-2ab4aa0de4a9 // indirect
+	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
+	github.com/shirou/gopsutil/v3 v3.23.4 // indirect
+	github.com/shoenig/go-m1cpu v0.1.5 // indirect
+	github.com/tklauser/go-sysconf v0.3.11 // indirect
+	github.com/tklauser/numcpus v0.6.0 // indirect
+	github.com/yusufpapurcu/wmi v1.2.2 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 )

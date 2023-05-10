@@ -1,95 +1,27 @@
 package main
 
 import (
+	"audio-convert/models"
+	"audio-convert/services"
 	"fmt"
-	"io/fs"
 	"os"
-	"os/exec"
-	"strconv"
-	"strings"
-	"sync"
 )
 
-type UserInputs struct {
-	inputPath  string
-	outputPath string
-	bitRate    int
-}
+func getInputs() models.UserInputs {
+	var userInputs models.UserInputs
 
-var convertTo = ".mp3"
-var wg = new(sync.WaitGroup)
+	// fmt.Print("INPUT path: ")
+	// fmt.Scanln(&userInputs.InputPath)
 
-const maxGoroutines = 10
-
-func handleConvert(folderName string, file fs.FileInfo, guard <-chan struct{}, userInputs UserInputs) {
-	defer wg.Done()
-
-	pathFile := userInputs.inputPath + "/" + folderName + "/" + file.Name()
-	originalExtension := file.Name()[strings.LastIndex(file.Name(), ".")+1:]
-	newFileName := strings.Replace(file.Name(), originalExtension, "."+convertTo, -1)
-	newPathFile := userInputs.outputPath + "/" + newFileName
-
-	err := exec.Command("ffmpeg", "-i", pathFile, "-ab", strconv.Itoa(userInputs.bitRate)+"k", "-map_metadata", "0", "-id3v2_version", "3", newPathFile).Run()
-	if err != nil {
-		fmt.Println("Error:", file.Name(), err)
-		<-guard
-		return
-	}
-
-	<-guard
-	fmt.Println("OK:", file.Name())
-	file.Name()
-}
-
-func handleReadFiles(f *os.File, guard chan struct{}, userInputs UserInputs) {
-	folders, err := f.Readdir(0)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	for _, folder := range folders {
-		if folder.IsDir() {
-			_folder, err := os.Open(userInputs.inputPath + "/" + folder.Name())
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-
-			files, err := _folder.Readdir(0)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-
-			for _, file := range files {
-				guard <- struct{}{}
-
-				wg.Add(1)
-				go handleConvert(folder.Name(), file, guard, userInputs)
-
-			}
-
-			wg.Wait()
-		}
-	}
-}
-
-func getInputs() UserInputs {
-	var userInputs UserInputs
-
-	fmt.Print("INPUT path: ")
-	fmt.Scan(&userInputs.inputPath)
-
-	fmt.Print("OUTPUT path: ")
-	fmt.Scan(&userInputs.outputPath)
+	// fmt.Print("OUTPUT path: ")
+	// fmt.Scanln(&userInputs.OutputPath)
 
 	fmt.Print("MP3 bitrate: ")
-	fmt.Scan(&userInputs.bitRate)
-	if userInputs.bitRate > 320 {
-		userInputs.bitRate = 320
-	} else if userInputs.bitRate < 128 {
-		userInputs.bitRate = 128
+	fmt.Scanln(&userInputs.BitRate)
+	if userInputs.BitRate > 320 {
+		userInputs.BitRate = 320
+	} else if userInputs.BitRate < 128 {
+		userInputs.BitRate = 128
 	}
 
 	return userInputs
@@ -97,11 +29,16 @@ func getInputs() UserInputs {
 
 // //////////////
 func main() {
-	guard := make(chan struct{}, maxGoroutines) // to limit Go-routines
+	// limiter := &cpulimit.Limiter{
+	// 	MaxCPUUsage:     20.0,                   // throttle if current cpu usage is over 50%
+	// 	MeasureInterval: time.Millisecond * 333, // measure cpu usage in an interval of 333 milliseconds
+	// 	Measurements:    3,                      // use the average of the last 3 measurements for cpu usage calculation
+	// }
+	// limiter.Start()
 
 	userInputs := getInputs()
 
-	f, err := os.Open(userInputs.inputPath)
+	f, err := os.Open(services.InputPath)
 
 	if err != nil {
 		err := fmt.Errorf("Error: %q", err)
@@ -109,5 +46,5 @@ func main() {
 		return
 	}
 
-	handleReadFiles(f, guard, userInputs)
+	services.HandleReadFiles(f, userInputs)
 }

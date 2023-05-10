@@ -1,2 +1,13 @@
 /music
 /output
+
+# Test binary, built with `go test -c`
+*.test
+
+*.idea
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
