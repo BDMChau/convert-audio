@@ -1,8 +1,8 @@
 package services
 
 import (
-	"audio-convert/constants"
 	"audio-convert/models"
+	"audio-convert/shared"
 	"fmt"
 	"io"
 	"io/fs"
@@ -75,7 +75,7 @@ func handleConvert(folderName string, file fs.FileInfo, guard <-chan struct{}, u
 	}()
 
 	originalExtension := filepath.Ext(file.Name())
-	if !constants.CheckFileType01ByEx(originalExtension) {
+	if !shared.CheckFileTypeIsNotFlacByEx(originalExtension) {
 		_, err := handleConvertOtherFile(folderName, file, userInputs, originalExtension)
 		if err != nil {
 			fmt.Println("Error:", file.Name(), err)

@@ -27,25 +27,40 @@ func getInputs() models.UserInputs {
 	return userInputs
 }
 
+func selectService() int8 {
+	var serviceNumber int8 = 0
+
+	fmt.Println("Enter service: ")
+	fmt.Println("1: Music Converter")
+	fmt.Println("2: Web Crawler")
+	fmt.Scanln(&serviceNumber)
+
+	if serviceNumber == 0 {
+		fmt.Println("Error, invalid input!")
+		return selectService()
+	}
+
+	return serviceNumber
+}
+
 // //////////////
 func main() {
+	switch selectService() {
+	case 1:
+		userInputs := getInputs()
 
-	// limiter := &cpulimit.Limiter{
-	// 	MaxCPUUsage:     20.0,                   // throttle if current cpu usage is over 50%
-	// 	MeasureInterval: time.Millisecond * 333, // measure cpu usage in an interval of 333 milliseconds
-	// 	Measurements:    3,                      // use the average of the last 3 measurements for cpu usage calculation
-	// }
-	// limiter.Start()
+		f, err := os.Open(services.InputPath)
+		if err != nil {
+			err := fmt.Errorf("Error: %q", err)
+			fmt.Println(err)
+			return
+		}
+		defer f.Close()
 
-	userInputs := getInputs()
+		services.HandleReadFiles(f, userInputs)
 
-	f, err := os.Open(services.InputPath)
-	if err != nil {
-		err := fmt.Errorf("Error: %q", err)
-		fmt.Println(err)
-		return
+	case 2:
+
+		services.Crawler()
 	}
-	defer f.Close()
-
-	services.HandleReadFiles(f, userInputs)
 }
