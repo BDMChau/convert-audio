@@ -29,6 +29,7 @@ func getInputs() models.UserInputs {
 
 // //////////////
 func main() {
+
 	// limiter := &cpulimit.Limiter{
 	// 	MaxCPUUsage:     20.0,                   // throttle if current cpu usage is over 50%
 	// 	MeasureInterval: time.Millisecond * 333, // measure cpu usage in an interval of 333 milliseconds
@@ -39,12 +40,12 @@ func main() {
 	userInputs := getInputs()
 
 	f, err := os.Open(services.InputPath)
-
 	if err != nil {
 		err := fmt.Errorf("Error: %q", err)
 		fmt.Println(err)
 		return
 	}
+	defer f.Close()
 
 	services.HandleReadFiles(f, userInputs)
 }
