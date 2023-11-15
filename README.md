@@ -1,1 +1,1 @@
-Just learn Go >.<
+Just for learning Go >.<
